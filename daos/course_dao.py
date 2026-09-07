@@ -18,7 +18,24 @@ class CourseDao(Dao[Course]):
         :param course: à créer sous forme d'entité Course en BD
         :return: l'id de l'entité insérée en BD (0 si la création a échoué)
         """
-        ...
+        try:
+            with Dao.connection.cursor() as cursor:
+                #if (course.teacher is None):
+                #    print("L'enseignant doit exister dans l'objet Cours")
+                #    return 0
+
+                sql = "INSERT INTO course(name, start_date, end_date, id_teacher) VALUES (%s, %s, %s, %s) "
+                id_teacher = course.teacher.id
+                cursor.execute(sql, (course.name, course.start_date, course.end_date, id_teacher))
+
+                #On récupère l'identifiant qui vient d'être créé
+                course.id = cursor.lastrowid
+                #On commit
+                Dao.connection.commit()
+            return course.id
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return 0
 
     def read(self, id_course: int) -> Optional[Course]:
