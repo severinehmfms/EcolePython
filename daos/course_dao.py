@@ -61,7 +61,20 @@ class CourseDao(Dao[Course]):
         :param course: cours déjà mis à jour en mémoire
         :return: True si la mise à jour a pu être réalisée
         """
-        ...
+        try:
+            with Dao.connection.cursor() as cursor:
+                sql = "UPDATE course set name=%s, start_date=%s, end_date=%s, id_teacher=%s WHERE id_course=%s "
+                cursor.execute(sql, (course.name, course.start_date, course.end_date, course.teacher.id, course.id))
+
+                # On commit
+                Dao.connection.commit()
+
+                # cursor.rowcount permet de savoir si une ligne a été modifiée
+                return cursor.rowcount > 0
+
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return True
 
     def delete(self, course: Course) -> bool:
@@ -70,5 +83,18 @@ class CourseDao(Dao[Course]):
         :param course: cours dont l'entité Course correspondante est à supprimer
         :return: True si la suppression a pu être réalisée
         """
-        ...
+        try:
+            with Dao.connection.cursor() as cursor:
+                sql = "DELETE FROM course WHERE id_course = %s "
+                cursor.execute(sql, (course.id))
+
+                # On commit
+                Dao.connection.commit()
+
+                # cursor.rowcount permet de savoir si une ligne a été modifiée
+                return cursor.rowcount > 0
+
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return True
