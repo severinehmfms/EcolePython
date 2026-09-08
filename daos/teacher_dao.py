@@ -36,12 +36,12 @@ class TeacherDao(Dao[Teacher]):
             cursor.execute(sql)
             teachers_lignes_sql = cursor.fetchall()
             teachers_objets = []
-            print("Nombre de résultats :", len(teachers_lignes_sql))
-            print("Résultats :", teachers_lignes_sql)
-            print(f"on va afficher les résultats pour cette requête {sql} ")
+            #print("Nombre de résultats :", len(teachers_lignes_sql))
+            #print("Résultats :", teachers_lignes_sql)
+            #print(f"on va afficher les résultats pour cette requête {sql} ")
 
             for s in teachers_lignes_sql:
-                print(s)
+                #print(s)
                 teacher = Teacher(s['first_name'], s['last_name'], s['age'], s['hiring_date'])
                 teacher.id = s['id_teacher']
                 teachers_objets.append(teacher)
