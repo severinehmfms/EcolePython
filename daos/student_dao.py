@@ -31,8 +31,6 @@ class StudentDao(Dao[Student]):
 
     def read_all(self):
         """Renvoit la liste des cours """
-        student: Optional[Student]
-
         with Dao.connection.cursor() as cursor:
             sql = "SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, person.id_address FROM student JOIN person ON student.id_person = person.id_person "
             cursor.execute(sql)
