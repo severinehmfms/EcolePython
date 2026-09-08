@@ -49,11 +49,23 @@ class TeacherDao(Dao[Teacher]):
             Dao.connection.rollback()
         return 0
 
-    # TODO Méthode à implémenter
     def read(self, id_teacher: int) -> Optional[Teacher]:
         """Renvoit le teacher correspondant à l'entité dont l'id est id_teacher
            (ou None s'il n'a pu être trouvé)"""
-        return None
+
+        teacher: Optional[Teacher]
+
+        with Dao.connection.cursor() as cursor:
+            sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person WHERE id_teacher=%s"
+            cursor.execute(sql, (id_teacher,))
+            record = cursor.fetchone()
+        if record is not None:
+            teacher = Teacher(record['first_name'], record['last_name'], record['age'], record['hiring_date'])
+            teacher.id = record['id_teacher']
+        else:
+            teacher = None
+
+        return teacher
 
     def read_all(self):
         """Renvoit la liste des professeurs """
@@ -84,12 +96,11 @@ class TeacherDao(Dao[Teacher]):
 
         return True
 
-    # TODO Méthode à implémenter
     def delete(self, teacher: Teacher) -> bool:
         """Supprime en BD l'entité Teacher correspondant à teacher
 
         :param teacher: teacher dont l'entité Teacher correspondante est à supprimer
         :return: True si la suppression a pu être réalisée
         """
-
+        
         return True
