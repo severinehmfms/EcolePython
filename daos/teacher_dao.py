@@ -50,7 +50,7 @@ class TeacherDao(Dao[Teacher]):
         return 0
 
     def read(self, id_teacher: int) -> Optional[Teacher]:
-        """Renvoit le teacher correspondant à l'entité dont l'id est id_teacher
+        """Renvoie le teacher correspondant à l'entité dont l'id est id_teacher
            (ou None s'il n'a pu être trouvé)"""
 
         teacher: Optional[Teacher]
@@ -68,7 +68,7 @@ class TeacherDao(Dao[Teacher]):
         return teacher
 
     def read_all(self):
-        """Renvoit la liste des professeurs """
+        """Renvoie la liste des professeurs """
         with Dao.connection.cursor() as cursor:
             sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person "
             cursor.execute(sql)
