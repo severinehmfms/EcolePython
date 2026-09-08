@@ -20,7 +20,32 @@ class StudentDao(Dao[Student]):
         :param student: à créer sous forme d'entité Student en BD
         :return: l'id de l'entité insérée en BD (0 si la création a échoué)
         """
+        try:
+            with Dao.connection.cursor() as cursor:
+                # On doit créer en premier la personne, puis récupérer l'id et ensuite créer l'étudiant relié à l'id de la personne
+                if (student.address is None):
+                    sql = "INSERT INTO person(first_name, last_name, age) VALUES (%s, %s, %s) "
+                    cursor.execute(sql, (student.first_name, student.last_name, student.age))
+                else:
+                    sql = "INSERT INTO person(first_name, last_name, age, id_address) VALUES (%s, %s, %s, %s) "
+                    cursor.execute(sql, (student.first_name, student.last_name, student.age, student.address.id))
 
+                # On récupère l'identifiant de la personne qui vient d'être créé
+                id_person_created = cursor.lastrowid
+
+                # On crée ensuite l'étudiant correspondant à cette personne
+                sql = "INSERT INTO student(student_nbr, id_person) VALUES (%s, %s) "
+                cursor.execute(sql, (id_person_created,id_person_created))
+
+                # On récupère l'identifiant de l'étudiant qui vient d'être créé
+                student.student_nbr = cursor.lastrowid
+
+                # On commit
+                Dao.connection.commit()
+            return student.id
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return 0
 
     # TODO Méthode à implémenter
