@@ -24,8 +24,8 @@ class StudentDao(Dao[Student]):
         return 0
 
     # TODO Méthode à implémenter
-    def read(self, id_student: int) -> Optional[Student]:
-        """Renvoit le cours correspondant à l'entité dont l'id est id_course
+    def read(self, student_nbr: int) -> Optional[Student]:
+        """Renvoit le student correspondant à l'entité dont l'id est student_nbr
            (ou None s'il n'a pu être trouvé)"""
         return None
 
@@ -62,9 +62,9 @@ class StudentDao(Dao[Student]):
 
     # TODO Méthode à implémenter
     def delete(self, student: Student) -> bool:
-        """Supprime en BD l'entité Course correspondant à course
+        """Supprime en BD l'entité Student correspondant à student
 
-        :param course: cours dont l'entité Course correspondante est à supprimer
+        :param student: student dont l'entité Student correspondante est à supprimer
         :return: True si la suppression a pu être réalisée
         """
 
