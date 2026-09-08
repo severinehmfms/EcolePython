@@ -102,5 +102,46 @@ class TeacherDao(Dao[Teacher]):
         :param teacher: teacher dont l'entité Teacher correspondante est à supprimer
         :return: True si la suppression a pu être réalisée
         """
-        
+        try:
+            with Dao.connection.cursor() as cursor:
+
+                #On va d'abord récupérer l'id de la personne qui correspond à cet enseignant
+                sql = "SELECT id_person FROM teacher WHERE id_teacher = %s"
+                cursor.execute(sql, (teacher.id,))
+
+                result = cursor.fetchone()
+
+                if result is None:
+                    print("Erreur lors de la récupération de l'id de la personne correspondant à cet enseignant")
+                    return False
+
+                id_person = result['id_person']
+                #print("Id personne : ", id_person)
+
+                # On va supprimer l'enseignant
+                sql = "DELETE FROM teacher WHERE id_teacher = %s "
+                cursor.execute(sql, (teacher.id,))
+
+                # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
+                if cursor.rowcount != 1:
+                    #Si il y a erreur on remet la base dans l'état ou elle était
+                    Dao.connection.rollback()
+                    return False
+
+                # On va supprimer la personne qui correspond à l'enseignant
+                sql = "DELETE FROM person WHERE id_person = %s"
+                cursor.execute(sql, (id_person,))
+
+                # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
+                if cursor.rowcount != 1:
+                    # Si il y a erreur on remet la base dans l'état ou elle était
+                    Dao.connection.rollback()
+                    return False
+
+                # Si c'est ok, on commit
+                Dao.connection.commit()
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
+            return False
         return True
