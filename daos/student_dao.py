@@ -13,7 +13,6 @@ from typing import Optional
 @dataclass
 class StudentDao(Dao[Student]):
 
-    # TODO Méthode à implémenter
     def create(self, student: Student) -> int:
         """Crée en BD l'entité Student correspondant au Student student
 
@@ -23,7 +22,6 @@ class StudentDao(Dao[Student]):
         try:
             with Dao.connection.cursor() as cursor:
 
-                print(student)
                 # On doit créer en premier la personne, puis récupérer l'id et ensuite créer l'étudiant relié à l'id de la personne
                 if (student.address is None):
                     sql = "INSERT INTO person(first_name, last_name, age) VALUES (%s, %s, %s) "
