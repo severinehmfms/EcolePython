@@ -13,14 +13,40 @@ from typing import Optional
 @dataclass
 class TeacherDao(Dao[Teacher]):
 
-    # TODO Méthode à implémenter
     def create(self, teacher: Teacher) -> int:
         """Crée en BD l'entité Teacher correspondant au Teacher teacher
 
         :param teacher: à créer sous forme d'entité Teacher en BD
         :return: l'id de l'entité insérée en BD (0 si la création a échoué)
         """
+        try:
+            with Dao.connection.cursor() as cursor:
 
+                # On doit créer en premier la personne, puis récupérer l'id et ensuite créer l'étudiant relié à l'id de la personne
+                if (teacher.address is None):
+                    sql = "INSERT INTO person(first_name, last_name, age) VALUES (%s, %s, %s) "
+                    cursor.execute(sql, (teacher.first_name, teacher.last_name, teacher.age))
+                else:
+                    sql = "INSERT INTO person(first_name, last_name, age, id_address) VALUES (%s, %s, %s, %s) "
+                    cursor.execute(sql, (teacher.first_name, teacher.last_name, teacher.age, teacher.address.id))
+
+                # On récupère l'identifiant de la personne qui vient d'être créé
+                id_person = cursor.lastrowid
+
+                # On crée ensuite l'étudiant correspondant à cette personne
+                sql = "INSERT INTO teacher(hiring_date, id_person) VALUES (%s, %s) "
+                cursor.execute(sql, (teacher.hiring_date, id_person))
+
+                # On récupère l'identifiant de l'enseignant qui vient d'être créé
+                teacher.id = cursor.lastrowid
+
+                # On commit
+                Dao.connection.commit()
+            return teacher.id
+
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return 0
 
     # TODO Méthode à implémenter
