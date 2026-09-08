@@ -83,14 +83,44 @@ class StudentDao(Dao[Student]):
 
         return students_objets
 
-    # TODO Méthode à implémenter
     def update(self, student: Student) -> bool:
         """Met à jour en BD l'entité Student correspondant à student, pour y correspondre
 
         :param student: student déjà mis à jour en mémoire
         :return: True si la mise à jour a pu être réalisée
         """
+        try:
+            with Dao.connection.cursor() as cursor:
 
+                # On va d'abord récupérer l'id de la personne qui correspond à cet étudiant
+                sql = "SELECT id_person FROM student WHERE student_nbr = %s"
+                cursor.execute(sql, (student.student_nbr,))
+
+                result = cursor.fetchone()
+
+                if result is None:
+                    print("Erreur lors de la récupération de l'id de la personne correspondant à cet étudiant")
+                    return False
+
+                id_person = result['id_person']
+
+                #On modifie la personne correspondant à cet étudiant
+                if (student.address is None):
+                    sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s WHERE id_person=%s "
+                    cursor.execute(sql, (student.first_name, student.last_name, student.age, id_person))
+                else:
+                    sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s, id_address=%s WHERE id_person=%s "
+                    cursor.execute(sql,(student.first_name, student.last_name, student.age, student.address.id, id_person))
+
+                # On commit
+                Dao.connection.commit()
+
+                # cursor.rowcount permet de savoir si une ligne a été modifiée
+                return cursor.rowcount > 0
+
+        except Exception as e:
+            print(f"Exception : {e}")
+            Dao.connection.rollback()
         return True
 
     def delete(self, student: Student) -> bool:
