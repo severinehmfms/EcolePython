@@ -53,6 +53,27 @@ class School:
         course_dao: CourseDao = CourseDao()
         return course_dao.read(id_course)
 
+    def init_bd(self):
+        """ Initialisation du jeu de données pour l'école à partir de la base de données """
+
+        # On récupère la liste des étudiants en base de données
+
+
+        # On récupère la liste des cours en base de données
+        course_dao: CourseDao = CourseDao()
+        courses_objets = course_dao.read_all()
+
+        # On parcoure ces objets et on les ajoute dans self
+        for course in courses_objets:
+            self.add_course(course)
+
+        # On récupère la liste des enseignants en base de données
+
+
+        # TODO On récupère en base de données les cours que suivent les étudiants (?)
+
+
+
     def init_static(self) -> None:
         """Initialisation d'un jeu de test pour l'école."""
         

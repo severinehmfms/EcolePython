@@ -18,7 +18,10 @@ Bienvenue dans notre école
     school: School = School()
 
     # initialisation d'un ensemble de cours, enseignants et élèves composant l'école
-    school.init_static()
+    #school.init_static()
+
+    #
+    school.init_bd()
 
     # affichage de la liste des cours, leur enseignant et leurs élèves
     school.display_courses_list()
