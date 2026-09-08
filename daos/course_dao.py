@@ -57,15 +57,13 @@ class CourseDao(Dao[Course]):
 
     def read_all(self):
         """Renvoit la liste des cours """
-        course: Optional[Course]
-
         with Dao.connection.cursor() as cursor:
             sql = "SELECT * FROM course "
             cursor.execute(sql)
             courses = cursor.fetchall()
             courses_objets = []
             for c in courses:
-                print(c)
+                #print(c)
                 course = Course(c['name'], c['start_date'], c['end_date'])
                 course.id = c['id_course']
                 courses_objets.append(course)
