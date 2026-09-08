@@ -9,6 +9,7 @@ from datetime import date
 
 from daos.course_dao import CourseDao
 from daos.student_dao import StudentDao
+from daos.teacher_dao import TeacherDao
 from models.address import Address
 from models.course import Course
 from models.teacher import Teacher
@@ -55,6 +56,12 @@ class School:
             print(f"Etudiant : {student}")
             print()
 
+    def display_teachers_list(self) -> None:
+        """Affichage de la liste des professeurs """
+        for teacher in self.teachers:
+            print(f"Professeur : {teacher}")
+            print()
+
     @staticmethod
     def get_course_by_id(id_course: int):
         course_dao: CourseDao = CourseDao()
@@ -63,14 +70,15 @@ class School:
     def init_bd(self):
         """ Initialisation du jeu de données pour l'école à partir de la base de données """
 
+        # TODO On récupère les adresses en base de donnée (ou peut être mis ailleurs?)
+
+
         # On récupère la liste des étudiants en base de données
         student_dao: StudentDao = StudentDao()
         student_objets = student_dao.read_all()
 
         for s in student_objets:
             self.add_student(s)
-
-
 
         # On récupère la liste des cours en base de données
         course_dao: CourseDao = CourseDao()
@@ -81,9 +89,17 @@ class School:
             self.add_course(c)
 
         # On récupère la liste des enseignants en base de données
+        teacher_dao: TeacherDao = TeacherDao()
+        teacher_objets = teacher_dao.read_all()
 
+        # On parcoure ces objets et on les ajoute dans self
+        for s in teacher_objets:
+            self.add_teacher(s)
 
-        # TODO On récupère en base de données les cours que suivent les étudiants (?)
+        # TODO On récupère en base de données les cours que suivent les étudiants
+
+        # TODO On récupère en base de données les enseignants qui enseignent un cours?
+
 
 
 
