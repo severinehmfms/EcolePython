@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from daos.course_dao import CourseDao
+from daos.student_dao import StudentDao
 from models.address import Address
 from models.course import Course
 from models.teacher import Teacher
@@ -48,6 +49,12 @@ class School:
                 print(f"- {student}")
             print()
 
+    def display_students_list(self) -> None:
+        """Affichage de la liste des étudiants """
+        for student in self.students:
+            print(f"Etudiant : {student}")
+            print()
+
     @staticmethod
     def get_course_by_id(id_course: int):
         course_dao: CourseDao = CourseDao()
@@ -57,6 +64,12 @@ class School:
         """ Initialisation du jeu de données pour l'école à partir de la base de données """
 
         # On récupère la liste des étudiants en base de données
+        student_dao: StudentDao = StudentDao()
+        student_objets = student_dao.read_all()
+
+        for s in student_objets:
+            self.add_student(s)
+
 
 
         # On récupère la liste des cours en base de données
@@ -64,8 +77,8 @@ class School:
         courses_objets = course_dao.read_all()
 
         # On parcoure ces objets et on les ajoute dans self
-        for course in courses_objets:
-            self.add_course(course)
+        for c in courses_objets:
+            self.add_course(c)
 
         # On récupère la liste des enseignants en base de données
 

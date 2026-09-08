@@ -20,8 +20,11 @@ Bienvenue dans notre école
     # initialisation d'un ensemble de cours, enseignants et élèves composant l'école
     #school.init_static()
 
-    #
+    # initialise les données à partir de la base de données
     school.init_bd()
+
+    # affiche la liste des étudiants
+    school.display_students_list()
 
     # affichage de la liste des cours, leur enseignant et leurs élèves
     school.display_courses_list()
