@@ -22,6 +22,8 @@ class StudentDao(Dao[Student]):
         """
         try:
             with Dao.connection.cursor() as cursor:
+
+                print(student)
                 # On doit créer en premier la personne, puis récupérer l'id et ensuite créer l'étudiant relié à l'id de la personne
                 if (student.address is None):
                     sql = "INSERT INTO person(first_name, last_name, age) VALUES (%s, %s, %s) "
@@ -31,18 +33,16 @@ class StudentDao(Dao[Student]):
                     cursor.execute(sql, (student.first_name, student.last_name, student.age, student.address.id))
 
                 # On récupère l'identifiant de la personne qui vient d'être créé
-                id_person_created = cursor.lastrowid
+                student.student_nbr = cursor.lastrowid
 
                 # On crée ensuite l'étudiant correspondant à cette personne
                 sql = "INSERT INTO student(student_nbr, id_person) VALUES (%s, %s) "
-                cursor.execute(sql, (id_person_created,id_person_created))
-
-                # On récupère l'identifiant de l'étudiant qui vient d'être créé
-                student.student_nbr = cursor.lastrowid
+                cursor.execute(sql, (student.student_nbr,student.student_nbr))
 
                 # On commit
                 Dao.connection.commit()
-            return student.id
+            return student.student_nbr
+
         except Exception as e:
             print(f"Exception : {e}")
             Dao.connection.rollback()
