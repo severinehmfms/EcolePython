@@ -31,20 +31,18 @@ class TeacherDao(Dao[Teacher]):
 
     def read_all(self):
         """Renvoit la liste des professeurs """
-       # teacher: Optional[Teacher]
-
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT teacher.id_teacher, teacher.id_person, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person "
+            sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person "
             cursor.execute(sql)
             teachers_lignes_sql = cursor.fetchall()
             teachers_objets = []
-            #print("Nombre de résultats :", len(teachers_lignes_sql))
-            #print("Résultats :", teachers_lignes_sql)
-            #print(f"on va afficher les résultats pour cette requête {sql} ")
+            print("Nombre de résultats :", len(teachers_lignes_sql))
+            print("Résultats :", teachers_lignes_sql)
+            print(f"on va afficher les résultats pour cette requête {sql} ")
 
             for s in teachers_lignes_sql:
-                #print(s)
-                teacher = Teacher(s['first_name'], s['last_name'], s['age'])
+                print(s)
+                teacher = Teacher(s['first_name'], s['last_name'], s['age'], s['hiring_date'])
                 teacher.id = s['id_teacher']
                 teachers_objets.append(teacher)
 
