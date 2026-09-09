@@ -289,6 +289,10 @@ poetry.toml
 pyrightconfig.json
 
 test.py
+testConnexion.py
+test_fonctions.py
+test_pymysql.py
+
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python
 
