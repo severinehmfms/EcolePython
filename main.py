@@ -62,6 +62,18 @@ Bienvenue dans notre école
     # initialise les données à partir de la base de données
     school.init_bd()
 
+    #Affichage d'un enseignant pour test (ok)
+    #print("Affichage de l'enseignant 51 pour test")
+    #teacher = school.get_teacher_by_id(51)
+    #print(teacher)
+    #exit(0)
+
+    # Affichage d'un étudiant pour test (ok)
+    # print("Affichage de l'étudiant 87 pour test")
+    # student = school.get_student_by_nbr(87)
+    # print(student)
+    # exit(0)
+
     # Menu de l'application => En test dans un premier temps (à modifier quand je gérerai la connection utilisateur)
     menu = [
         "Afficher la liste des cours",
@@ -75,11 +87,13 @@ Bienvenue dans notre école
     choix = -1
     # On ne sort pas du programme tant que l'utilisateur ne l'a pas spécifié
     while (choix != 0):
+        # On récupère le choix de l'utilisateur par rapport au menu
         choix = input_principal_menu(menu)
         # Affichage des cours (avec enseignants et élèves)
         if (choix == 1):
             print("Liste des cours \n")
             school.display_courses_list()
+
         # Affichage des cours pour un étudiant donné (par son numéro)
         elif (choix == 2):
             print("Méthode non écrite")
@@ -88,10 +102,12 @@ Bienvenue dans notre école
         elif (choix == 3):
             print("Liste des étudiants \n")
             school.display_students_list()
+
         # Affichage de la liste des enseignants
         elif (choix == 4):
             print("Liste des enseignants \n")
             school.display_teachers_list()
+
         # TODO Modifier pour faire Gestion des cours
         elif (choix == 5):
             print("Création d'un cours de test \n")
@@ -108,6 +124,7 @@ Bienvenue dans notre école
             course.teacher = teacher
             course.student = [student]
             school.add_course(course)
+
         # TODO Modifier pour faire Gestion des étudiants (ajout, modif, sup)
         elif (choix == 6):
             print("Création d'un étudiant de test\n")

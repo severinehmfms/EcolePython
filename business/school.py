@@ -85,16 +85,23 @@ class School:
         course_dao: CourseDao = CourseDao()
         return course_dao.read(id_course)
 
+    @staticmethod
+    def get_teacher_by_id(id_teacher: int):
+        teacher_dao: TeacherDao = TeacherDao()
+        return teacher_dao.read(id_teacher)
+
+    @staticmethod
+    def get_student_by_nbr(student_nbr: int):
+        student_dao: StudentDao = StudentDao()
+        return student_dao.read(student_nbr)
+
     def init_bd(self):
         """ Initialisation du jeu de données pour l'école à partir de la base de données """
-
-        # TODO On récupère les adresses en base de donnée (ou peut être mis ailleurs?)
-
 
         # On récupère la liste des étudiants en base de données
         student_dao: StudentDao = StudentDao()
         student_objets = student_dao.read_all()
-
+        # Pour chaque étudiant en base, on ajoute l'étudiant dans la liste des étudiants
         for s in student_objets:
             self.students.append(s)
 
@@ -109,8 +116,7 @@ class School:
         # On récupère la liste des enseignants en base de données
         teacher_dao: TeacherDao = TeacherDao()
         teacher_objets = teacher_dao.read_all()
-
-        # On parcoure ces objets et on les ajoute dans self
+        # Pour chaque enseignant en base, on ajoute l'enseignant dans la liste des enseignants
         for s in teacher_objets:
             self.teachers.append(s)
 
