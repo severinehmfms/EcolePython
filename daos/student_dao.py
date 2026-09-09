@@ -3,7 +3,7 @@
 """
 Classe Dao[Student]
 """
-
+from models.address import Address
 from models.student import Student
 from daos.dao import Dao
 from dataclasses import dataclass
@@ -52,12 +52,21 @@ class StudentDao(Dao[Student]):
         student: Optional[Student]
 
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, person.id_address FROM student JOIN person ON student.id_person = person.id_person WHERE student_nbr=%s"
+            #sql = "SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, person.id_address FROM student JOIN person ON student.id_person = person.id_person WHERE student_nbr=%s"
+            sql = ("SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, "
+                   "person.id_address, address.street, address.city, address.postal_code "
+                   "FROM student JOIN person ON student.id_person = person.id_person "
+                   "LEFT JOIN address ON person.id_address = address.id_address  "
+                   "WHERE student_nbr=%s")
             cursor.execute(sql, (student_nbr,))
             record = cursor.fetchone()
         if record is not None:
             student = Student(record['first_name'], record['last_name'], record['age'])
             student.student_nbr = record['student_nbr']
+            address_id = record['id_address']
+            if (address_id is not None):
+                student.address = Address(record['street'], record['city'], record['postal_code'])
+            student.address.id = address_id
         else:
             student = None
 
@@ -67,7 +76,12 @@ class StudentDao(Dao[Student]):
     def read_all(self):
         """Renvoie la liste des cours """
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, person.id_address FROM student JOIN person ON student.id_person = person.id_person "
+            #sql = "SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, person.id_address FROM student JOIN person ON student.id_person = person.id_person "
+            sql = ("SELECT student.student_nbr, student.id_person, person.first_name, person.last_name, person.age, "
+                   "person.id_address, address.street, address.city, address.postal_code "
+                   "FROM student JOIN person ON student.id_person = person.id_person "
+                   "LEFT JOIN address ON person.id_address = address.id_address  ")
+
             cursor.execute(sql)
             students_lignes_sql = cursor.fetchall()
             students_objets = []
@@ -76,11 +90,16 @@ class StudentDao(Dao[Student]):
             #print(f"on va afficher les résultats pour cette requête {sql} ")
 
             for s in students_lignes_sql:
-                #print(s)
+                # On récupère les informations pour l'objet Student
                 student = Student(s['first_name'], s['last_name'], s['age'])
                 student.student_nbr = s['student_nbr']
+                # On récupère les informations pour l'objet Address
+                address_id = s['id_address']
+                if (address_id is not None):
+                    student.address = Address(s['street'], s['city'], s['postal_code'])
+                    student.address.id = address_id
+                # On ajoute le Student ainsi obtenu dans la liste
                 students_objets.append(student)
-
         return students_objets
 
     def update(self, student: Student) -> bool:
