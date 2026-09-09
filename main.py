@@ -110,9 +110,10 @@ Bienvenue dans notre école
 
         # TODO Modifier pour faire Gestion des cours
         elif (choix == 5):
-            print("Création d'un cours de test \n")
+            print("Gestion des cours => Non géré pour le moment \n")
+
             # test de la création d'un cours (ok)
-            teacher = Teacher('Marie', 'Curie', 31, date(2023, 9, 4))
+            """teacher = Teacher('Marie', 'Curie', 31, date(2023, 9, 4))
             teacher.id = 4
             student: Student = Student('Valérie', 'Dumont', 13)
             student.id = 2
@@ -123,23 +124,46 @@ Bienvenue dans notre école
             )
             course.teacher = teacher
             course.student = [student]
-            school.add_course(course)
+            school.add_course(course)"""
+            
+
 
         # TODO Modifier pour faire Gestion des étudiants (ajout, modif, sup)
         elif (choix == 6):
-            print("Création d'un étudiant de test\n")
-            # test de la création d'un étudiant
-            student: Student = Student('André', 'Dupont', 14)
-            student.address = Address('36 rue des dunes de sables', 'Labenne', 40100)
-            school.add_student(student)
+            print("Gestion des étudiants => Non géré pour le moment \n")
+            # test de la création d'un étudiant (ok)
+            # student: Student = Student('André', 'Dupont', 14)
+            # student.address = Address('36 rue des dunes de sables', 'Labenne', 40100)
+            # school.add_student(student)
+
+            student = school.get_student_by_nbr(87)
+            # On va tester la modification de cet étudiant (ok)
+            #student.last_name = "Durand"
+            #student.first_name = "Antoine"
+            #student.address.street = "37 avenue de la lune de miel"
+            #school.update_student(student)
+
+            # On va tester la suppression de cet étudiant (ok)
+            #school.delete_student(student)
 
         # TODO Modifier pour faire Gestion des enseignants (ajout, modif, sup)
         elif (choix == 7):
-            print("Création d'un enseignant de test \n")
-            # test de la création d'un enseignant
-            teacher: Teacher = Teacher('Miranda', 'Bailey', 25, date(2023, 9, 4))
-            teacher.address = Address('276 rue des camélias', 'Bayonne', 64100)
-            school.add_teacher(teacher)
+            print("Gestion des enseignants => Non géré pour le moment \n")
+            # test de la création d'un enseignant (ok)
+            #teacher: Teacher = Teacher('Miranda', 'Bailey', 25, date(2023, 9, 4))
+            #teacher.address = Address('276 rue des camélias', 'Bayonne', 64100)
+            #school.add_teacher(teacher)
+
+            # teacher = school.get_teacher_by_id(52)
+
+            # On va tester la modification de cet enseignant (ok)
+            #teacher.last_name = "Greys"
+            #teacher.first_name = "Meredith"
+            #teacher.address.street = "277 rue des roses"
+            #school.update_teacher(teacher)
+
+            # On va tester la suppression de cet enseignant (ok)
+            #school.delete_teacher(teacher)
         elif (choix == 0):
             print("Merci, et à bientôt! ")
 
