@@ -58,6 +58,16 @@ class School:
         """Ajout de l'élève spécifié à la liste des élèves."""
         self.students.append(student)
 
+    def update_teacher(self, teacher: Teacher) -> None:
+        # On modifie l'enseignant en base
+        dao = TeacherDao()
+        dao.update(teacher)
+        """Modification de l'enseignant spécifié dans la liste des enseignants aussi """
+        for i, s in enumerate(self.teachers):
+            if s.id == teacher.id:
+                self.teachers[i] = teacher
+                break
+
     def update_student(self, student: Student) -> None:
         # On modifie l'étudiant en base
         dao = StudentDao()
@@ -68,15 +78,25 @@ class School:
                 self.students[i] = student
                 break
 
-    def update_teacher(self, teacher: Teacher) -> None:
+    def delete_teacher(self, teacher: Teacher) -> None:
         # On modifie l'enseignant en base
         dao = TeacherDao()
-        dao.update(teacher)
-        """Modification de l'enseignant spécifié dans la liste des enseignants aussi """
-        for i, s in enumerate(self.teachers):
-            if s.id == teacher.id:
-                self.teachers[i] = teacher
-                break
+        """Suppression de l'enseignant spécifié dans la liste des enseignants aussi si la suppression a réussi"""
+        if dao.delete(teacher):
+            for i, s in enumerate(self.teachers):
+                if s.id == teacher.id:
+                    self.teachers.pop(i)
+                    break
+
+    def delete_student(self, student: Student) -> None:
+        # On modifie l'étudiant en base
+        dao = StudentDao()
+        """Suppression de l'enseignant spécifié dans la liste des enseignants aussi si la suppression a réussi """
+        if dao.delete(student):
+            for i, s in enumerate(self.students):
+                if s.student_nbr == student.student_nbr:
+                    self.students.pop(i)
+                    break
 
     def display_courses_list(self) -> None:
         """Affichage de la liste des cours avec pour chacun d'eux :
