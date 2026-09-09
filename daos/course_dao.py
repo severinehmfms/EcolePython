@@ -39,7 +39,7 @@ class CourseDao(Dao[Course]):
         return 0
 
     def read(self, id_course: int) -> Optional[Course]:
-        """Renvoit le cours correspondant à l'entité dont l'id est id_course
+        """Renvoie le cours correspondant à l'entité dont l'id est id_course
            (ou None s'il n'a pu être trouvé)"""
         course: Optional[Course]
         
@@ -56,7 +56,7 @@ class CourseDao(Dao[Course]):
         return course
 
     def read_all(self):
-        """Renvoit la liste des cours """
+        """Renvoie la liste des cours """
         with Dao.connection.cursor() as cursor:
             sql = "SELECT * FROM course "
             cursor.execute(sql)
