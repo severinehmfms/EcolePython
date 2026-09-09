@@ -120,7 +120,7 @@ Bienvenue dans notre école
         elif (choix == 7):
             print("Création d'un enseignant de test \n")
             # test de la création d'un enseignant
-            teacher: Teacher = Teacher('Sophie', 'Delarue', 25, date(2023, 9, 4))
+            teacher: Teacher = Teacher('Miranda', 'Bailey', 25, date(2023, 9, 4))
             teacher.address = Address('276 rue des camélias', 'Bayonne', 64100)
             school.add_teacher(teacher)
         elif (choix == 0):

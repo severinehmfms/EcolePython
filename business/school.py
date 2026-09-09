@@ -7,6 +7,7 @@ Classe School
 from dataclasses import dataclass, field
 from datetime import date
 
+from daos.address_dao import AddressDao
 from daos.course_dao import CourseDao
 from daos.student_dao import StudentDao
 from daos.teacher_dao import TeacherDao
@@ -36,7 +37,10 @@ class School:
         self.courses.append(course)
 
     def add_teacher(self, teacher: Teacher) -> None:
-        # TODO Quand le DAO address fonctionnera, il faudra aussi créer l'adresse je pense
+        # On crée l'adresse de l'enseignant
+        dao_address = AddressDao()
+        teacher.address.id = dao_address.create(teacher.address)
+
         # On crée l'enseignant en base
         dao = TeacherDao()
         teacher.id = dao.create(teacher)
@@ -44,7 +48,10 @@ class School:
         self.teachers.append(teacher)
 
     def add_student(self, student: Student) -> None:
-        # TODO Quand le DAO address fonctionnera, il faudra aussi créer l'adresse je pense
+        # On crée l'adresse de l'étudiant
+        dao_address = AddressDao()
+        student.address.id = dao_address.create(student.address)
+
         # On crée l'étudiant en base
         dao = StudentDao()
         student.student_nbr = dao.create(student)
