@@ -29,14 +29,25 @@ class School:
     students: list[Student] = field(default_factory=list, init=False)
 
     def add_course(self, course: Course) -> None:
+        # On crée le cours en base de données
+        dao = CourseDao()
+        course.id = dao.create(course)
         """Ajout du cours course à la liste des cours."""
         self.courses.append(course)
 
     def add_teacher(self, teacher: Teacher) -> None:
+        # TODO Quand le DAO address fonctionnera, il faudra aussi créer l'adresse je pense
+        # On crée l'enseignant en base
+        dao = TeacherDao()
+        teacher.id = dao.create(teacher)
         """Ajout de l'enseignant teacher à la liste des enseignants."""
         self.teachers.append(teacher)
 
     def add_student(self, student: Student) -> None:
+        # TODO Quand le DAO address fonctionnera, il faudra aussi créer l'adresse je pense
+        # On crée l'étudiant en base
+        dao = StudentDao()
+        student.student_nbr = dao.create(student)
         """Ajout de l'élève spécifié à la liste des élèves."""
         self.students.append(student)
 
