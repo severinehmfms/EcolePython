@@ -89,7 +89,7 @@ class School:
         student_objets = student_dao.read_all()
 
         for s in student_objets:
-            self.add_student(s)
+            self.students.append(s)
 
         # On récupère la liste des cours en base de données
         course_dao: CourseDao = CourseDao()
@@ -97,7 +97,7 @@ class School:
 
         # On parcoure ces objets et on les ajoute dans self
         for c in courses_objets:
-            self.add_course(c)
+            self.courses.append(c)
 
         # On récupère la liste des enseignants en base de données
         teacher_dao: TeacherDao = TeacherDao()
@@ -105,7 +105,7 @@ class School:
 
         # On parcoure ces objets et on les ajoute dans self
         for s in teacher_objets:
-            self.add_teacher(s)
+            self.teachers.append(s)
 
         # TODO On récupère en base de données les cours que suivent les étudiants
 
