@@ -160,7 +160,7 @@ class TeacherDao(Dao[Teacher]):
 
                 # On va d'abord récupérer l'id de la personne et l'id de l'adresse qui correspondent à cet enseignant
                 #sql = "SELECT id_person FROM teacher WHERE id_teacher = %s"
-                sql = ("SELECT id_person, id_address "
+                sql = ("SELECT teacher.id_person, person.id_address "
                        "FROM teacher JOIN person ON teacher.id_person = person.id_person "
                        "LEFT JOIN address ON person.id_address = address.id_address  "
                        "WHERE id_teacher = %s")
@@ -200,8 +200,8 @@ class TeacherDao(Dao[Teacher]):
                 sql = "DELETE FROM address WHERE id_address = %s"
                 cursor.execute(sql, (id_address,))
 
-                print(sql)
-                print("DELETE address :", cursor.rowcount)
+                #print(sql)
+                #print("DELETE address :", cursor.rowcount)
 
                 # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
                 if cursor.rowcount != 1:
