@@ -156,7 +156,7 @@ class StudentDao(Dao[Student]):
         try:
             with Dao.connection.cursor() as cursor:
                 # On va d'abord récupérer l'id de la personne et l'id de l'adresse qui correspondent à cet étudiant
-                sql = ("SELECT id_person, id_address "
+                sql = ("SELECT student.id_person, person.id_address "
                        "FROM student JOIN person ON student.id_person = person.id_person "
                        "LEFT JOIN address ON person.id_address = address.id_address  "
                        "WHERE student_nbr = %s")
@@ -170,16 +170,15 @@ class StudentDao(Dao[Student]):
 
                 id_person = result['id_person']
                 id_address = result['id_address']
-                # print("Id personne : ", id_person)
 
                 # On va supprimer l'élève
                 sql = "DELETE FROM student WHERE student_nbr = %s "
                 cursor.execute(sql, (student.student_nbr,))
 
-                print(sql)
-                print("student_nbr :", student.student_nbr)
-                print("id_person :", id_person)
-                print("DELETE student :", cursor.rowcount)
+                #print(sql)
+                #print("student_nbr :", student.student_nbr)
+                #print("id_person :", id_person)
+                #print("DELETE student :", cursor.rowcount)
 
                 # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
                 if cursor.rowcount != 1:
@@ -191,8 +190,8 @@ class StudentDao(Dao[Student]):
                 sql = "DELETE FROM person WHERE id_person = %s"
                 cursor.execute(sql, (id_person,))
 
-                print(sql)
-                print("DELETE person :", cursor.rowcount)
+                #print(sql)
+                #print("DELETE person :", cursor.rowcount)
 
                 # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
                 if cursor.rowcount != 1:
@@ -204,8 +203,8 @@ class StudentDao(Dao[Student]):
                 sql = "DELETE FROM address WHERE id_address = %s"
                 cursor.execute(sql, (id_address,))
 
-                print(sql)
-                print("DELETE address :", cursor.rowcount)
+                #print(sql)
+                #print("DELETE address :", cursor.rowcount)
 
                 # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
                 if cursor.rowcount != 1:
