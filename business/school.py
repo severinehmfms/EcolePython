@@ -58,6 +58,26 @@ class School:
         """Ajout de l'élève spécifié à la liste des élèves."""
         self.students.append(student)
 
+    def update_student(self, student: Student) -> None:
+        # On modifie l'étudiant en base
+        dao = StudentDao()
+        dao.update(student)
+        """Modification de l'élève spécifié dans la liste des élèves aussi """
+        for i, s in enumerate(self.students):
+            if s.student_nbr == student.student_nbr:
+                self.students[i] = student
+                break
+
+    def update_teacher(self, teacher: Teacher) -> None:
+        # On modifie l'enseignant en base
+        dao = TeacherDao()
+        dao.update(teacher)
+        """Modification de l'enseignant spécifié dans la liste des enseignants aussi """
+        for i, s in enumerate(self.teachers):
+            if s.id == teacher.id:
+                self.teachers[i] = teacher
+                break
+
     def display_courses_list(self) -> None:
         """Affichage de la liste des cours avec pour chacun d'eux :
         - leur enseignant
