@@ -128,8 +128,13 @@ class StudentDao(Dao[Student]):
                     sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s WHERE id_person=%s "
                     cursor.execute(sql, (student.first_name, student.last_name, student.age, id_person))
                 else:
+                    # Si cet étudiant est relié à une adresse
                     sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s, id_address=%s WHERE id_person=%s "
                     cursor.execute(sql,(student.first_name, student.last_name, student.age, student.address.id, id_person))
+
+                    # On modifie aussi l'adresse
+                    sql = "UPDATE address set street=%s, city=%s, postal_code=%s WHERE id_address=%s "
+                    cursor.execute(sql,(student.address.street, student.address.city, student.address.postal_code, student.address.id))
 
                 # On commit
                 Dao.connection.commit()
@@ -150,17 +155,21 @@ class StudentDao(Dao[Student]):
         """
         try:
             with Dao.connection.cursor() as cursor:
-                # On va d'abord récupérer l'id de la personne qui correspond à cet étudiant
-                sql = "SELECT id_person FROM student WHERE student_nbr = %s"
+                # On va d'abord récupérer l'id de la personne et l'id de l'adresse qui correspondent à cet étudiant
+                sql = ("SELECT id_person, id_address "
+                       "FROM student JOIN person ON student.id_person = person.id_person "
+                       "LEFT JOIN address ON person.id_address = address.id_address  "
+                       "WHERE student_nbr = %s")
                 cursor.execute(sql, (student.student_nbr,))
 
                 result = cursor.fetchone()
 
                 if result is None:
-                    print("Erreur lors de la récupération de l'id de la personne correspondant à cet étudiant")
+                    print("Erreur lors de la récupération de l'id de la personne et de l'id de l'adresse correspondants à cet étudiant")
                     return False
 
                 id_person = result['id_person']
+                id_address = result['id_address']
                 # print("Id personne : ", id_person)
 
                 # On va supprimer l'élève
@@ -178,12 +187,25 @@ class StudentDao(Dao[Student]):
                     Dao.connection.rollback()
                     return False
 
-                # On va supprimer la personne qui correspond à l'enseignant
+                # On va supprimer la personne qui correspond à l'élève
                 sql = "DELETE FROM person WHERE id_person = %s"
                 cursor.execute(sql, (id_person,))
 
                 print(sql)
                 print("DELETE person :", cursor.rowcount)
+
+                # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
+                if cursor.rowcount != 1:
+                    # Si il y a erreur on remet la base dans l'état ou elle était
+                    Dao.connection.rollback()
+                    return False
+
+                # On va supprimer l'adresse qui correspond à cette personne
+                sql = "DELETE FROM address WHERE id_address = %s"
+                cursor.execute(sql, (id_address,))
+
+                print(sql)
+                print("DELETE address :", cursor.rowcount)
 
                 # cursor.rowcount = nombre de lignes qui ont été affectées par cette requête. On attend une seule (une suppression).
                 if cursor.rowcount != 1:
