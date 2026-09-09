@@ -3,7 +3,7 @@
 """
 Classe Dao[Teacher]
 """
-
+from models.address import Address
 from models.teacher import Teacher
 from daos.dao import Dao
 from dataclasses import dataclass
@@ -56,12 +56,20 @@ class TeacherDao(Dao[Teacher]):
         teacher: Optional[Teacher]
 
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person WHERE id_teacher=%s"
+            sql = ("SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, "
+                   "person.id_address, address.street, address.city, address.postal_code "
+                   "FROM teacher JOIN person ON teacher.id_person = person.id_person "
+                   "LEFT JOIN address ON person.id_address = address.id_address "
+                   "WHERE id_teacher=%s")
             cursor.execute(sql, (id_teacher,))
             record = cursor.fetchone()
         if record is not None:
             teacher = Teacher(record['first_name'], record['last_name'], record['age'], record['hiring_date'])
             teacher.id = record['id_teacher']
+            address_id = record['id_address']
+            if (address_id is not None):
+                teacher.address = Address(record['street'], record['city'], record['postal_code'])
+                teacher.address.id = address_id
         else:
             teacher = None
 
@@ -70,7 +78,12 @@ class TeacherDao(Dao[Teacher]):
     def read_all(self):
         """Renvoie la liste des professeurs """
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person "
+            #sql = "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, person.id_address FROM teacher JOIN person ON teacher.id_person = person.id_person "
+            sql = (
+                "SELECT teacher.id_teacher, teacher.id_person, teacher.hiring_date, person.first_name, person.last_name, person.age, "
+                "person.id_address, address.street, address.city, address.postal_code "
+                "FROM teacher JOIN person ON teacher.id_person = person.id_person "
+                "LEFT JOIN address ON person.id_address = address.id_address ")
             cursor.execute(sql)
             teachers_lignes_sql = cursor.fetchall()
             teachers_objets = []
@@ -79,11 +92,16 @@ class TeacherDao(Dao[Teacher]):
             #print(f"on va afficher les résultats pour cette requête {sql} ")
 
             for s in teachers_lignes_sql:
-                #print(s)
+                # On récupère les informations pour l'objet Teacher
                 teacher = Teacher(s['first_name'], s['last_name'], s['age'], s['hiring_date'])
                 teacher.id = s['id_teacher']
+                # On récupère les informations pour l'objet Address
+                address_id = s['id_address']
+                if (address_id is not None):
+                    teacher.address = Address(s['street'], s['city'], s['postal_code'])
+                    teacher.address.id = address_id
+                # On ajoute le Teacher ainsi obtenu dans la liste
                 teachers_objets.append(teacher)
-
         return teachers_objets
 
     def update(self, teacher: Teacher) -> bool:
