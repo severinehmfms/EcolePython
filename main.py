@@ -6,6 +6,7 @@ Application de gestion d'une école
 """
 import re
 from datetime import date
+from xmlrpc.client import MAXINT
 
 from business.school import School
 from models.address import Address
@@ -109,22 +110,49 @@ def menu_gestion_student(school):
                 student_to_create.address = Address(street, city, postal_code)
             school.add_student(student_to_create)
         elif (choix == 2):
-            #TODO
             print("Modifier un étudiant")
+            numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à modifier : ",1, len(list_students_show))
+            student_sans_add = list_students_show[numero_line_student - 1]
+            #On récupère l'étudiant complet à partir du numéro d'étudiant(sinon on perd l'address que je n'ai pas remonté dans la liste...)
+            print(f"On va chercher l'étudiant numéro {student_sans_add.student_nbr}")
+            student = school.get_student_by_nbr(student_sans_add.student_nbr)
 
-            # student = school.get_student_by_nbr(87)
-            # On va tester la modification de cet étudiant (ok)
-            # student.last_name = "Durand"
-            # student.first_name = "Antoine"
-            # student.address.street = "37 avenue de la lune de miel"
-            # school.update_student(student)
-
+            if (student is not None):
+                student.last_name = get_str_input("Entrez le nom de cet étudiant : ")
+                student.first_name = get_str_input("Entrez le prénom de cet étudiant : ")
+                student.age = get_int_input("Entrez l'âge de cet étudiant : ", 0, 100)
+                is_student_address = input_bool("Est ce que vous souhaitez ajouter/modifier l'adresse de cet étudiant ?")
+                # Si l'utilisateur a demandé à modifier l'adresse (non nulle)
+                if (is_student_address and student.address is not None):
+                    student.address.street = get_str_input("Entrez l'adresse : ")
+                    student.address.city = get_str_input("Entrez la ville : ")
+                    student.address.postal_code = get_str_postal_code("Entrez le code postal : ")
+                # Si l'utilisateur a demandé à ajouter une adresse (adresse nulle)
+                elif (is_student_address and student.address is None):
+                    street = get_str_input("Entrez l'adresse : ")
+                    city = get_str_input("Entrez la ville : ")
+                    postal_code = get_str_postal_code("Entrez le code postal : ")
+                    student.address = Address(street, city, postal_code)
+                school.update_student(student)
+            else:
+                print("Erreur il n'a pas été possible de récupérer l'étudiant correspondant à ce numéro de ligne")
         elif (choix == 3):
             print("Supprimer un étudiant")
+            numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à supprimer : ", 1, len(list_students_show))
+            student_sans_add = list_students_show[numero_line_student - 1]
+            # On récupère l'étudiant complet à partir du numéro d'étudiant(sinon on perd l'address que je n'ai pas remonté dans la liste...)
+            print(f"On va chercher l'étudiant numéro {student_sans_add.student_nbr}")
+            student = school.get_student_by_nbr(student_sans_add.student_nbr)
+            # On demande confirmation avant la suppression
+            confirmation_delete = input_bool(f"Etes vous sur de vouloir supprimer cet étudiant : {student.last_name} {student.first_name} ?")
 
-            # On va tester la suppression de cet étudiant (ok)
-            # school.delete_student(student)
-
+            # On va supprimer cet étudiant
+            if (student is not None and confirmation_delete):
+                school.delete_student(student)
+            elif (not confirmation_delete):
+                print("La suppression a bien été annulée")
+            else:
+                print("Erreur il n'a pas été possible de récupérer l'étudiant correspondant à ce numéro de ligne")
         elif (choix == 0):
             print("Retour au menu précédent")
 

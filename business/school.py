@@ -92,7 +92,7 @@ class School:
     def delete_student(self, student: Student) -> None:
         # On modifie l'étudiant en base
         dao = StudentDao()
-        """Suppression de l'enseignant spécifié dans la liste des enseignants aussi si la suppression a réussi """
+        """Suppression de l'étudiant spécifié dans la liste des étudiants aussi si la suppression a réussi """
         if dao.delete(student):
             for i, s in enumerate(self.students):
                 if s.student_nbr == student.student_nbr:
@@ -113,7 +113,7 @@ class School:
         return self.courses
 
     def display_students_list(self) -> None:
-        """Affichage de la liste des étudiasnts """
+        """Affichage de la liste des étudiants """
         for student in self.students:
             print(f"Etudiant : {student}")
             print()

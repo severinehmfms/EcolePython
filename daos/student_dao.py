@@ -66,7 +66,7 @@ class StudentDao(Dao[Student]):
             address_id = record['id_address']
             if (address_id is not None):
                 student.address = Address(record['street'], record['city'], record['postal_code'])
-            student.address.id = address_id
+                student.address.id = address_id
         else:
             student = None
 
@@ -110,7 +110,6 @@ class StudentDao(Dao[Student]):
         """
         try:
             with Dao.connection.cursor() as cursor:
-
                 # On va d'abord récupérer l'id de la personne qui correspond à cet étudiant
                 sql = "SELECT id_person FROM student WHERE student_nbr = %s"
                 cursor.execute(sql, (student.student_nbr,))
@@ -128,13 +127,32 @@ class StudentDao(Dao[Student]):
                     sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s WHERE id_person=%s "
                     cursor.execute(sql, (student.first_name, student.last_name, student.age, id_person))
                 else:
-                    # Si cet étudiant est relié à une adresse
-                    sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s, id_address=%s WHERE id_person=%s "
-                    cursor.execute(sql,(student.first_name, student.last_name, student.age, student.address.id, id_person))
+                    # On vérifie si l'étudiant avait déjà une adresse en base
+                    sql = "SELECT id_address FROM person WHERE id_person = %s"
+                    cursor.execute(sql, (id_person,))
+                    result = cursor.fetchone()
+                    id_address = result["id_address"] if result else None
 
-                    # On modifie aussi l'adresse
-                    sql = "UPDATE address set street=%s, city=%s, postal_code=%s WHERE id_address=%s "
-                    cursor.execute(sql,(student.address.street, student.address.city, student.address.postal_code, student.address.id))
+                    # Il avait déjà une adresse en base -> on la modifie
+                    if id_address is not None:
+                        # Si cet étudiant était déjà relié à une adresse
+                        sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s, id_address=%s WHERE id_person=%s "
+                        cursor.execute(sql,(student.first_name, student.last_name, student.age, student.address.id, id_person))
+
+                        # On modifie aussi l'adresse
+                        sql = "UPDATE address set street=%s, city=%s, postal_code=%s WHERE id_address=%s "
+                        cursor.execute(sql,(student.address.street, student.address.city, student.address.postal_code, student.address.id))
+                    else:
+                        #L'étudiant n'avait pas déjà d'adresse en base on la crée.
+                        sql = "INSERT INTO address(street, city, postal_code) VALUES (%s, %s, %s)"
+                        cursor.execute(sql,(student.address.street, student.address.city, student.address.postal_code))
+                        # Récupération de l'ID de la nouvelle adresse
+                        id_address = cursor.lastrowid
+                        print(f"On a donc créé l'id : {id_address}")
+
+                        #On modifie la personne en intégrant l'id de la nouvelle adresse
+                        sql = "UPDATE person SET first_name=%s, last_name=%s, age=%s, id_address=%s WHERE id_person=%s"
+                        cursor.execute(sql,(student.first_name, student.last_name, student.age, id_address, id_person))
 
                 # On commit
                 Dao.connection.commit()
