@@ -151,6 +151,12 @@ class School:
         list_id_courses = student_dao.read_id_courses_by_student(student.student_nbr)
         return list_id_courses
 
+    def get_students_by_course(self, course: Course):
+        """Fonction qui renvoie la liste des nbr des étudiants inscrits à ce cours"""
+        course_dao: CourseDao = CourseDao()
+        list_nbr_student = course_dao.read_id_student_by_cours(course.id)
+        return list_nbr_student
+
     def init_bd(self):
         """ Initialisation du jeu de données pour l'école à partir de la base de données """
 
@@ -158,27 +164,34 @@ class School:
         student_dao: StudentDao = StudentDao()
         student_objets = student_dao.read_all()
         # Pour chaque étudiant en base, on ajoute l'étudiant dans la liste des étudiants
-        for s in student_objets:
-            self.students.append(s)
+        for st in student_objets:
+            #On récupère la liste des cours pour cet étudiant
+            list_courses_id = self.get_courses_by_student(st)
+            # Pour chaque id de cours auquel l'étudiant est inscrit, on récupère l'objet cours
+            for id in list_courses_id:
+                cours: Course = self.get_course_by_id(id)
+                st.add_course(cours)
+            self.students.append(st)
 
         # On récupère la liste des enseignants en base de données
         teacher_dao: TeacherDao = TeacherDao()
         teacher_objets = teacher_dao.read_all()
         # Pour chaque enseignant en base, on ajoute l'enseignant dans la liste des enseignants
-        for s in teacher_objets:
-            self.teachers.append(s)
+        for st in teacher_objets:
+            self.teachers.append(st)
 
         # On récupère la liste des cours en base de données (y compris l'id de l'enseignant)
         course_dao: CourseDao = CourseDao()
         courses_objets = course_dao.read_all()
-
         # On parcoure ces objets et on les ajoute dans self
         for c in courses_objets:
+            # Pour chaque cours on récupère les étudiants suivant ce cours
+            list_students_nbr = self.get_students_by_course(c)
+            # Pour chaque id de student inscrit à ce cours, on récupère l'objet student
+            for nbr in list_students_nbr:
+                stud: Student = self.get_student_by_nbr(nbr)
+                c.add_student(stud)
             self.courses.append(c)
-
-
-
-        # TODO On récupère en base de données les cours que suivent les étudiants
 
     def init_static(self) -> None:
         """Initialisation d'un jeu de test pour l'école."""

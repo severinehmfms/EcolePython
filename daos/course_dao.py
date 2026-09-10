@@ -40,6 +40,22 @@ class CourseDao(Dao[Course]):
             Dao.connection.rollback()
         return 0
 
+    def read_id_student_by_cours(self, id_course : int) -> list:
+        """Renvoie la liste des id des étudiants qui suivent le cours dont l'id est en paramètre"""
+        student: Optional[Course]
+        list_nbr_students = []
+
+        with Dao.connection.cursor() as cursor:
+            # Je récupère maintenant les ids des cours auquel l'étudiant est inscrit
+            sql = "SELECT takes.student_nbr, takes.id_course FROM takes WHERE takes.id_course = %s"
+            cursor.execute(sql, (id_course,))
+            all_result = cursor.fetchall()
+            for record in all_result:
+                student_nbr = record['student_nbr']
+                list_nbr_students.append(student_nbr)
+
+        return list_nbr_students
+
     def read(self, id_course: int) -> Optional[Course]:
         """Renvoie le cours correspondant à l'entité dont l'id est id_course
            (ou None s'il n'a pu être trouvé)"""

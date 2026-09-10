@@ -47,8 +47,7 @@ class StudentDao(Dao[Student]):
         return 0
 
     def read_id_courses_by_student(self, student_nbr : int) -> list:
-        """Renvoie le student correspondant à l'entité dont l'id est student_nbr
-                   (ou None s'il n'a pu être trouvé)"""
+        """Renvoie la liste des id des cours suivis par l'étudiant dont le numéro est en paramètre"""
         student: Optional[Student]
         list_id_courses = []
 
