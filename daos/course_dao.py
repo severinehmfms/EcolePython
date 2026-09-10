@@ -9,6 +9,8 @@ from daos.dao import Dao
 from dataclasses import dataclass
 from typing import Optional
 
+from models.teacher import Teacher
+
 
 @dataclass
 class CourseDao(Dao[Course]):
@@ -44,12 +46,22 @@ class CourseDao(Dao[Course]):
         course: Optional[Course]
         
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT * FROM course WHERE id_course=%s"
+            #sql = "SELECT * FROM course WHERE id_course=%s"
+            sql = ("SELECT course.*, teacher.hiring_date, person.first_name, person.last_name, person.age "
+                   "FROM course JOIN teacher ON course.id_teacher = teacher.id_teacher "
+                   "JOIN person ON teacher.id_person = person.id_person "
+                   "WHERE id_course=%s")
+
             cursor.execute(sql, (id_course,))
             record = cursor.fetchone()
         if record is not None:
             course = Course(record['name'], record['start_date'], record['end_date'])
             course.id = record['id_course']
+            id_teacher = record['id_teacher']
+            teacher = Teacher(record['first_name'], record['last_name'], record['age'], record['hiring_date'])
+            teacher.id = record['id_teacher']
+            #course.teacher = teacher
+            course.set_teacher(teacher)
         else:
             course = None
 
@@ -58,16 +70,23 @@ class CourseDao(Dao[Course]):
     def read_all(self):
         """Renvoie la liste des cours """
         with Dao.connection.cursor() as cursor:
-            sql = "SELECT * FROM course "
+            #sql = "SELECT * FROM course "
+            sql = ("SELECT course.*, teacher.hiring_date, person.first_name, person.last_name, person.age "
+                   "FROM course JOIN teacher ON course.id_teacher = teacher.id_teacher "
+                   "JOIN person ON teacher.id_person = person.id_person ")
             cursor.execute(sql)
             courses = cursor.fetchall()
             courses_objets = []
             for c in courses:
-                #print(c)
                 course = Course(c['name'], c['start_date'], c['end_date'])
                 course.id = c['id_course']
+                # Pour chaque cours on renseigne le professeur enseignant ce cours
+                teacher = Teacher(c['first_name'], c['last_name'], c['age'], c['hiring_date'])
+                teacher.id = c['id_teacher']
+                # course.teacher = teacher
+                course.set_teacher(teacher)
+                # On ajoute ce cours à la liste des cours qui sera retournée
                 courses_objets.append(course)
-
         return courses_objets
 
     def update(self, course: Course) -> bool:

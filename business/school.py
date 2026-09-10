@@ -50,7 +50,8 @@ class School:
     def add_student(self, student: Student) -> None:
         # On crée l'adresse de l'étudiant
         dao_address = AddressDao()
-        student.address.id = dao_address.create(student.address)
+        if (student.address is not None):
+            student.address.id = dao_address.create(student.address)
 
         # On crée l'étudiant en base
         dao = StudentDao()
@@ -108,17 +109,26 @@ class School:
                 print(f"- {student}")
             print()
 
+    def get_courses_list(self) -> list[Course]:
+        return self.courses
+
     def display_students_list(self) -> None:
-        """Affichage de la liste des étudiants """
+        """Affichage de la liste des étudiasnts """
         for student in self.students:
             print(f"Etudiant : {student}")
             print()
+
+    def get_students_list(self) -> list[Student]:
+        return self.students
 
     def display_teachers_list(self) -> None:
         """Affichage de la liste des professeurs """
         for teacher in self.teachers:
             print(f"Professeur : {teacher}")
             print()
+
+    def get_teachers_list(self) -> list[Teacher]:
+        return self.teachers
 
     @staticmethod
     def get_course_by_id(id_course: int):
@@ -145,14 +155,6 @@ class School:
         for s in student_objets:
             self.students.append(s)
 
-        # On récupère la liste des cours en base de données
-        course_dao: CourseDao = CourseDao()
-        courses_objets = course_dao.read_all()
-
-        # On parcoure ces objets et on les ajoute dans self
-        for c in courses_objets:
-            self.courses.append(c)
-
         # On récupère la liste des enseignants en base de données
         teacher_dao: TeacherDao = TeacherDao()
         teacher_objets = teacher_dao.read_all()
@@ -160,12 +162,17 @@ class School:
         for s in teacher_objets:
             self.teachers.append(s)
 
+        # On récupère la liste des cours en base de données (y compris l'id de l'enseignant)
+        course_dao: CourseDao = CourseDao()
+        courses_objets = course_dao.read_all()
+
+        # On parcoure ces objets et on les ajoute dans self
+        for c in courses_objets:
+            self.courses.append(c)
+
+
+
         # TODO On récupère en base de données les cours que suivent les étudiants
-
-        # TODO On récupère en base de données les enseignants qui enseignent un cours?
-
-
-
 
     def init_static(self) -> None:
         """Initialisation d'un jeu de test pour l'école."""
