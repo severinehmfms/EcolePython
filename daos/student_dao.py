@@ -46,6 +46,23 @@ class StudentDao(Dao[Student]):
             Dao.connection.rollback()
         return 0
 
+    def read_id_courses_by_student(self, student_nbr : int) -> list:
+        """Renvoie le student correspondant à l'entité dont l'id est student_nbr
+                   (ou None s'il n'a pu être trouvé)"""
+        student: Optional[Student]
+        list_id_courses = []
+
+        with Dao.connection.cursor() as cursor:
+            # Je récupère maintenant les ids des cours auquel l'étudiant est inscrit
+            sql = "SELECT takes.student_nbr, takes.id_course FROM takes WHERE takes.student_nbr = %s"
+            cursor.execute(sql, (student_nbr,))
+            all_result = cursor.fetchall()
+            for record in all_result:
+                course_id = record['id_course']
+                list_id_courses.append(course_id)
+
+        return list_id_courses
+
     def read(self, student_nbr: int) -> Optional[Student]:
         """Renvoie le student correspondant à l'entité dont l'id est student_nbr
            (ou None s'il n'a pu être trouvé)"""
@@ -60,18 +77,16 @@ class StudentDao(Dao[Student]):
                    "WHERE student_nbr=%s")
             cursor.execute(sql, (student_nbr,))
             record = cursor.fetchone()
-        if record is not None:
-            student = Student(record['first_name'], record['last_name'], record['age'])
-            student.student_nbr = record['student_nbr']
-            address_id = record['id_address']
-            if (address_id is not None):
-                student.address = Address(record['street'], record['city'], record['postal_code'])
-                student.address.id = address_id
-        else:
-            student = None
-
+            if record is not None:
+                student = Student(record['first_name'], record['last_name'], record['age'])
+                student.student_nbr = record['student_nbr']
+                address_id = record['id_address']
+                if (address_id is not None):
+                    student.address = Address(record['street'], record['city'], record['postal_code'])
+                    student.address.id = address_id
+            else:
+                student = None
         return student
-
 
     def read_all(self):
         """Renvoie la liste des cours """

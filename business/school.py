@@ -145,6 +145,12 @@ class School:
         student_dao: StudentDao = StudentDao()
         return student_dao.read(student_nbr)
 
+    def get_courses_by_student(self, student: Student):
+        """Fonction qui renvoie la liste des id des cours auquel l'étudiant est inscrit"""
+        student_dao: StudentDao = StudentDao()
+        list_id_courses = student_dao.read_id_courses_by_student(student.student_nbr)
+        return list_id_courses
+
     def init_bd(self):
         """ Initialisation du jeu de données pour l'école à partir de la base de données """
 

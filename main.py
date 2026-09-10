@@ -5,10 +5,9 @@
 Application de gestion d'une école
 """
 import re
-from datetime import date
-from xmlrpc.client import MAXINT
 
 from business.school import School
+from models import course
 from models.address import Address
 from models.course import Course
 from models.student import Student
@@ -96,7 +95,7 @@ def menu_gestion_student(school):
         # On récupère le choix de l'utilisateur par rapport au sous-menu
         choix = input_menu(sous_menu_gestion_students)
         if (choix == 1):
-            print("**************************Création d'un étudiant")
+            print("*****************Créer un étudiant")
             #On demande à l'utilisateur les informations pour cet étudiant à créer
             last_name = get_str_input("Entrez le nom de cet étudiant : ")
             first_name = get_str_input("Entrez le prénom de cet étudiant : ")
@@ -110,7 +109,7 @@ def menu_gestion_student(school):
                 student_to_create.address = Address(street, city, postal_code)
             school.add_student(student_to_create)
         elif (choix == 2):
-            print("Modifier un étudiant")
+            print("*****************Modifier un étudiant")
             numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à modifier : ",1, len(list_students_show))
             student_sans_add = list_students_show[numero_line_student - 1]
             #On récupère l'étudiant complet à partir du numéro d'étudiant(sinon on perd l'address que je n'ai pas remonté dans la liste...)
@@ -137,7 +136,7 @@ def menu_gestion_student(school):
             else:
                 print("Erreur il n'a pas été possible de récupérer l'étudiant correspondant à ce numéro de ligne")
         elif (choix == 3):
-            print("Supprimer un étudiant")
+            print("*****************Supprimer un étudiant")
             numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à supprimer : ", 1, len(list_students_show))
             student_sans_add = list_students_show[numero_line_student - 1]
             # On récupère l'étudiant complet à partir du numéro d'étudiant(sinon on perd l'address que je n'ai pas remonté dans la liste...)
@@ -156,6 +155,7 @@ def menu_gestion_student(school):
         elif (choix == 0):
             print("Retour au menu précédent")
 
+#TODO Fonction non terminée j'ai pas fini d'implémenter les formulaires pour création/modification/suppression d'un enseignant
 def menu_gestion_teacher(school):
     sous_menu_gestion_teachers = [
         "Créer un enseignant",
@@ -171,15 +171,15 @@ def menu_gestion_teacher(school):
         # On récupère le choix de l'utilisateur par rapport au sous-menu
         choix = input_menu(sous_menu_gestion_teachers)
         if (choix == 1):
-            print("Créer un enseignant")
-
+            print("*****************Créer un enseignant")
+            print("Fonction testée en test, mais formulaire non encore implémenté")
             # test de la création d'un enseignant (ok)
             # teacher: Teacher = Teacher('Miranda', 'Bailey', 25, date(2023, 9, 4))
             # teacher.address = Address('276 rue des camélias', 'Bayonne', 64100)
             # school.add_teacher(teacher)
         elif (choix == 2):
-            print("Modifier un enseignant")
-
+            print("*****************Modifier un enseignant")
+            print("Fonction testée en test, mais formulaire non encore implémenté")
             # teacher = school.get_teacher_by_id(52)
 
             # On va tester la modification de cet enseignant (ok)
@@ -188,12 +188,14 @@ def menu_gestion_teacher(school):
             # teacher.address.street = "277 rue des roses"
             # school.update_teacher(teacher)
         elif (choix == 3):
-            print("Supprimer un enseignant")
+            print("*****************Supprimer un enseignant")
+            print("Fonction testée en test, mais formulaire non encore implémenté")
             # On va tester la suppression de cet enseignant (ok)
             # school.delete_teacher(teacher)
         elif (choix == 0):
             print("Retour au menu précédent")
 
+#TODO Fonction non terminée j'ai pas fini d'implémenter les formulaires pour création/modification/suppression d'un cours
 def menu_gestion_courses(school):
     sous_menu_gestion_courses = [
         "Créer un cours",
@@ -210,7 +212,7 @@ def menu_gestion_courses(school):
         choix = input_menu(sous_menu_gestion_courses)
         if (choix == 1):
             print("Créer un cours")
-
+            print("*****************Fonction testée en test, mais formulaire non encore implémenté")
             # test de la création d'un cours (ok)
             """teacher = Teacher('Marie', 'Curie', 31, date(2023, 9, 4))
             teacher.id = 4
@@ -225,9 +227,11 @@ def menu_gestion_courses(school):
             course.student = [student]
             school.add_course(course)"""
         elif (choix == 2):
-            print("Modifier un cours")
+            print("*****************Modifier un cours")
+            print("Fonctionnalité non encore implémentée")
         elif (choix == 3):
-            print("Supprimer un cours")
+            print("*****************Supprimer un cours")
+            print("Fonctionnalité non encore implémentée")
         elif (choix == 0):
             print("Retour au menu précédent")
 
@@ -242,36 +246,19 @@ Bienvenue dans notre école
 
     # initialisation d'un ensemble de cours, enseignants et élèves composant l'école
     #school.init_static()
+
     # initialise les données à partir de la base de données
     school.init_bd()
 
-    #Affichage d'un enseignant pour test (ok)
-    #print("Affichage de l'enseignant 51 pour test")
-    #teacher = school.get_teacher_by_id(51)
-    #print(teacher)
-    #exit(0)
-
-    # Affichage d'un étudiant pour test (ok)
-    # print("Affichage de l'étudiant 87 pour test")
-    # student = school.get_student_by_nbr(87)
-    # print(student)
-    # exit(0)
-
-    # Affichage d'un cours pour test
-    # print("Affichage du cours 24 Java")
-    # courstest = school.get_course_by_id(24)
-    # print(courstest)
-    # exit(0)
-
     # Menu de l'application => En test dans un premier temps (à modifier quand je gérerai la connection utilisateur)
     menu = [
-        "Liste des cours",
-        "Liste des cours suivis par un étudiant",
-        "Liste des étudiants",
-        "Liste des enseignants",
-        "Gestion des cours",
-        "Gestion des étudiants",
-        "Gestion des enseignants"
+        "Liste cours",
+        "Liste cours suivis par un étudiant",
+        "Liste étudiants",
+        "Liste enseignants",
+        "Gestion cours",
+        "Gestion étudiants",
+        "Gestion enseignants"
     ]
     choix = -1
     # On ne sort pas du programme tant que l'utilisateur ne l'a pas spécifié
@@ -285,7 +272,26 @@ Bienvenue dans notre école
 
         # Affichage des cours pour un étudiant donné (par son numéro)
         elif (choix == 2):
-            print("Affichage des cours pour un étudiant donné : Méthode non écrite")
+            # On affiche la liste des étudiants
+            print("Liste des étudiants\n")
+            list_students_show = school.get_students_list()
+            for numero, student in enumerate(list_students_show, start=1):
+                print(f"{numero} - {student}")
+
+            numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant dont vous souhaitez connaître les cours : ", 1, len(list_students_show))
+            student_sans_add = list_students_show[numero_line_student - 1]
+            # Test de lecture d'un étudiant (avec les cours auquel il s'est inscrit)
+            student: Student = school.get_student_by_nbr(student_sans_add.student_nbr)
+            # On va récupérer les cours auquel il s'est inscrit
+            list_courses_id = school.get_courses_by_student(student)
+            # Pour chaque id on récupère l'objet cours
+            for id in list_courses_id:
+                cours: Course = school.get_course_by_id(id)
+                student.add_course(cours)
+            print("\n", student)
+            print("Cours suivis par cet étudiant : ")
+            for cours in student.courses_taken:
+                print(f" - {cours}")
 
         # Affichage de la liste des étudiants
         elif (choix == 3):
