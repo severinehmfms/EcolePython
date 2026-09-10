@@ -12,6 +12,7 @@ from models.address import Address
 from models.course import Course
 from models.student import Student
 from models.teacher import Teacher
+from datetime import datetime
 
 def input_bool(prompt) -> bool:
     """Fonction qui attend strictement oui ou non dans une saisie et renvoie booléen true/false correspondant"""
@@ -20,63 +21,76 @@ def input_bool(prompt) -> bool:
         text = input(prompt).lower().strip()
     return text == "oui"
 
-def is_saisie_str_ok(saisie):
-    """Vérifie si une saisie chaine est correcte (Aide chatgpt pour regex, je suis pas très douée avec les regex)"""
-    cleaned_saisie = saisie.strip()
-    return bool(re.fullmatch(r"[A-Za-zÀ-ÿ0-9 ]+", cleaned_saisie))
+def get_date_input(prompt):
+    """Demande à l'utilisateur de saisir une date valide."""
+    while True:
+        input_user = input(prompt).strip()
+
+        try:
+            date = datetime.strptime(input_user, "%d/%m/%Y")
+            return date
+
+        except ValueError:
+            print("Saisie incorrecte. Merci de recommencer.")
+
+def get_address_input(prompt):
+    """Demande à l'utilisateur de saisir une adresse. Accepte les espaces, les points, les chiffres..."""
+    while True:
+        input_user = input(prompt).strip()
+
+        if input_user and all(
+            char.isalnum() or char in " -'" for char in input_user
+        ):
+            return input_user
+
+        print("Saisie incorrecte. Merci de recommencer.")
 
 def get_str_input(prompt):
-    """Fonction qui demande à l'utilisateur de saisir une chaine"""
-    input_user = input(prompt)
-    while not is_saisie_str_ok(input_user):
-        input_user = input("Saisie incorrecte. Merci de recommencer : ")
-    return input_user
+    """Demande à l'utilisateur de saisir une chaîne alphanumérique. Sans espaces, ni tiret, ni chiffres..."""
+    while True:
+        input_user = input(prompt).strip()
 
-def is_saisie_postal_code_ok(saisie):
-    """Vérifie qu'une saisie correspond au format d'un code postal français."""
-    cleaned_code_postal = saisie.strip()
-    return len(cleaned_code_postal) == 5 and cleaned_code_postal.isdigit()
+        if input_user.isalpha():
+            return input_user
+
+        print("Saisie incorrecte. Merci de recommencer.")
 
 def get_str_postal_code(prompt):
-    """Fonction qui demande à l'utilisateur de saisir un code postal français"""
-    input_user = input(prompt)
-    while not is_saisie_postal_code_ok(input_user):
-        input_user = input("Saisie incorrecte. Merci de recommencer : ")
-    return input_user
+    """Demande à l'utilisateur de saisir un code postal français valide."""
+    postal_code = input(prompt).strip()
+
+    while len(postal_code) != 5 or not postal_code.isdigit():
+        postal_code = input("Saisie incorrecte. Merci de recommencer : ").strip()
+
+    return postal_code
 
 def get_int_input(prompt, min_int, max_int):
-    """Fonction qui demande à l'utilisateur de saisir un int"""
-    input_int = input(prompt)
-    while not is_entry_int_ok(input_int, min_int, max_int):
-        input_int = input("Saisie incorrecte. Merci de recommencer : ")
-    return int(input_int)
+    """Demande à l'utilisateur de saisir un entier compris entre min_int et max_int."""
+    user_input = input(prompt).strip()
 
-def is_entry_int_ok(user_input, min_int, max_int):
-    """ Fonction qui vérifie la saisie d'un numérique, entre min_int et max_int    """
-    cleaned_user_input = user_input.strip()
-    if not cleaned_user_input.isdigit():
-        return False
-    if int(cleaned_user_input) < min_int or int(cleaned_user_input) > max_int:
-        return False
-    return True
+    while not user_input.isdigit() or not min_int <= int(user_input) <= max_int:
+        user_input = input(
+            "Saisie incorrecte. Merci de recommencer : "
+        ).strip()
 
-def input_menu(items):
-    """ Fonction qui demande à l'utilisateur de choisir un item dans un menu passé en paramètre (tableau)
-        -Le choix 0 permet toujours de quitter.
-        -Les options fournies en paramètre commencent à 1
+    return int(user_input)
+
+def input_menu(items, multiline = False):
+    """Demande à l'utilisateur de choisir un item dans un menu.
+    Le choix 0 permet toujours de quitter.
+    Les options fournies en paramètre commencent à 1.
+
+    param items : liste des options du menu
+    param multiline : affiche le menu sur une seule ligne si False.
     """
+    separator = "\n" if multiline else " "
     menu = "Menu :\n"
-    menu += " - 0 Quitter "
-
+    menu += "- 0 Quitter"
+    menu += separator
     for numero, option in enumerate(items, start=1):
-        menu += f"- {numero} {option} "
+        menu += f"- {numero} {option} {separator}"
     menu += "\n"
-    input_menu = input(menu)
-
-    while not is_entry_int_ok(input_menu, 0, len(items)):
-        input_menu = input("Saisie incorrecte. Merci de recommencer : ")
-
-    return int(input_menu)
+    return get_int_input(menu, 0, len(items))
 
 def menu_gestion_student(school):
     sous_menu_gestion_students = [
@@ -84,17 +98,17 @@ def menu_gestion_student(school):
         "Modifier un étudiant",
         "Supprimer un étudiant"
     ]
-    choix = -1
+    choix_menu_stud = -1
     # On ne sort pas du programme tant que l'utilisateur ne l'a pas spécifié
-    while (choix != 0):
+    while (choix_menu_stud != 0):
         # On affiche la liste des étudiants
         print("Liste des étudiants\n")
         list_students_show = school.get_students_list()
         for numero, student in enumerate(list_students_show, start=1):
             print(f"{numero} - {student}")
         # On récupère le choix de l'utilisateur par rapport au sous-menu
-        choix = input_menu(sous_menu_gestion_students)
-        if (choix == 1):
+        choix_menu_stud = input_menu(sous_menu_gestion_students)
+        if (choix_menu_stud == 1):
             print("*****************Créer un étudiant")
             #On demande à l'utilisateur les informations pour cet étudiant à créer
             last_name = get_str_input("Entrez le nom de cet étudiant : ")
@@ -103,12 +117,12 @@ def menu_gestion_student(school):
             student_to_create: Student = Student(first_name, last_name, age)
             is_student_address = input_bool("Est ce que vous souhaitez entrer l'adresse de cet étudiant ?")
             if (is_student_address):
-                street = get_str_input("Entrez l'adresse : ")
+                street = get_address_input("Entrez l'adresse : ")
                 city = get_str_input("Entrez la ville : ")
                 postal_code = get_str_postal_code("Entrez le code postal : ")
                 student_to_create.address = Address(street, city, postal_code)
             school.add_student(student_to_create)
-        elif (choix == 2):
+        elif (choix_menu_stud == 2):
             print("*****************Modifier un étudiant")
             numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à modifier : ",1, len(list_students_show))
             student_sans_add = list_students_show[numero_line_student - 1]
@@ -123,19 +137,19 @@ def menu_gestion_student(school):
                 is_student_address = input_bool("Est ce que vous souhaitez ajouter/modifier l'adresse de cet étudiant ?")
                 # Si l'utilisateur a demandé à modifier l'adresse (non nulle)
                 if (is_student_address and student.address is not None):
-                    student.address.street = get_str_input("Entrez l'adresse : ")
+                    student.address.street = get_address_input("Entrez l'adresse : ")
                     student.address.city = get_str_input("Entrez la ville : ")
                     student.address.postal_code = get_str_postal_code("Entrez le code postal : ")
                 # Si l'utilisateur a demandé à ajouter une adresse (adresse nulle)
                 elif (is_student_address and student.address is None):
-                    street = get_str_input("Entrez l'adresse : ")
+                    street = get_address_input("Entrez l'adresse : ")
                     city = get_str_input("Entrez la ville : ")
                     postal_code = get_str_postal_code("Entrez le code postal : ")
                     student.address = Address(street, city, postal_code)
                 school.update_student(student)
             else:
                 print("Erreur il n'a pas été possible de récupérer l'étudiant correspondant à ce numéro de ligne")
-        elif (choix == 3):
+        elif (choix_menu_stud == 3):
             print("*****************Supprimer un étudiant")
             numero_line_student = get_int_input("Entrez le numéro de ligne de l'étudiant à supprimer : ", 1, len(list_students_show))
             student_sans_add = list_students_show[numero_line_student - 1]
@@ -152,7 +166,7 @@ def menu_gestion_student(school):
                 print("La suppression a bien été annulée")
             else:
                 print("Erreur il n'a pas été possible de récupérer l'étudiant correspondant à ce numéro de ligne")
-        elif (choix == 0):
+        elif (choix_menu_stud == 0):
             print("Retour au menu précédent")
 
 #TODO Fonction non terminée j'ai pas fini d'implémenter les formulaires pour création/modification/suppression d'un enseignant
@@ -162,22 +176,22 @@ def menu_gestion_teacher(school):
         "Modifier un enseignant",
         "Supprimer un enseignant"
     ]
-    choix = -1
+    choix_menu_teach = -1
     # On ne sort pas du programme tant que l'utilisateur ne l'a pas spécifié
-    while (choix != 0):
+    while (choix_menu_teach != 0):
         # On affiche la liste des enseignants
         print("Liste des enseignants\n")
         school.display_teachers_list()
         # On récupère le choix de l'utilisateur par rapport au sous-menu
-        choix = input_menu(sous_menu_gestion_teachers)
-        if (choix == 1):
+        choix_menu_teach = input_menu(sous_menu_gestion_teachers)
+        if (choix_menu_teach == 1):
             print("*****************Créer un enseignant")
             print("Fonction testée en test, mais formulaire non encore implémenté")
             # test de la création d'un enseignant (ok)
             # teacher: Teacher = Teacher('Miranda', 'Bailey', 25, date(2023, 9, 4))
             # teacher.address = Address('276 rue des camélias', 'Bayonne', 64100)
             # school.add_teacher(teacher)
-        elif (choix == 2):
+        elif (choix_menu_teach == 2):
             print("*****************Modifier un enseignant")
             print("Fonction testée en test, mais formulaire non encore implémenté")
             # teacher = school.get_teacher_by_id(52)
@@ -187,12 +201,12 @@ def menu_gestion_teacher(school):
             # teacher.first_name = "Meredith"
             # teacher.address.street = "277 rue des roses"
             # school.update_teacher(teacher)
-        elif (choix == 3):
+        elif (choix_menu_teach == 3):
             print("*****************Supprimer un enseignant")
             print("Fonction testée en test, mais formulaire non encore implémenté")
             # On va tester la suppression de cet enseignant (ok)
             # school.delete_teacher(teacher)
-        elif (choix == 0):
+        elif (choix_menu_teach == 0):
             print("Retour au menu précédent")
 
 #TODO Fonction non terminée j'ai pas fini d'implémenter les formulaires pour création/modification/suppression d'un cours
@@ -202,37 +216,39 @@ def menu_gestion_courses(school):
         "Modifier un cours",
         "Supprimer un cours"
     ]
-    choix = -1
+    choix_menu_course = -1
     # On ne sort pas du programme tant que l'utilisateur ne l'a pas spécifié
-    while (choix != 0):
+    while (choix_menu_course != 0):
         # On affiche la liste des cours
         print("Liste des cours \n")
         school.display_courses_list()
         # On récupère le choix de l'utilisateur par rapport au sous-menu
-        choix = input_menu(sous_menu_gestion_courses)
-        if (choix == 1):
-            print("Créer un cours")
-            print("*****************Fonction testée en test, mais formulaire non encore implémenté")
-            # test de la création d'un cours (ok)
-            """teacher = Teacher('Marie', 'Curie', 31, date(2023, 9, 4))
-            teacher.id = 4
-            student: Student = Student('Valérie', 'Dumont', 13)
-            student.id = 2
-            course = Course(
-                "Python",
-                date(2026, 6, 22),
-                date(2026, 6, 29),
-            )
-            course.teacher = teacher
-            course.student = [student]
-            school.add_course(course)"""
-        elif (choix == 2):
+        choix_menu_course = input_menu(sous_menu_gestion_courses)
+        if (choix_menu_course == 1):
+            print("*****************Créer un cours")
+
+            # On demande à l'utilisateur les informations pour ce cours à créer
+            name = get_str_input("Entrez le nom de ce cours : ")
+            start_date = get_date_input("Entrez la date de début du cours : ")
+            end_date = get_date_input("Entrez la date de fin du cours : ")
+            course_to_create: Course = Course(name, start_date, end_date)
+            # On affiche la liste des enseignants
+            print("Liste des enseignants\n")
+            list_teachers_show = school.get_teachers_list()
+            for numero, teacher in enumerate(list_teachers_show, start=1):
+                print(f"{numero} - {teacher}")
+            numero_line_teacher = get_int_input("Entrez le numéro de ligne de l'enseignant pour ce cours : ", 1, len(list_teachers_show))
+            # On récupère l'enseignant
+            teacher = list_teachers_show[numero_line_teacher - 1]
+            course_to_create.teacher = teacher
+            school.add_course(course_to_create)
+        elif (choix_menu_course == 2):
             print("*****************Modifier un cours")
             print("Fonctionnalité non encore implémentée")
-        elif (choix == 3):
+        elif (choix_menu_course == 3):
             print("*****************Supprimer un cours")
             print("Fonctionnalité non encore implémentée")
-        elif (choix == 0):
+        elif (choix_menu_course == 0):
             print("Retour au menu précédent")
 
 def main() -> None:
@@ -267,13 +283,13 @@ Bienvenue dans notre école
         choix = input_menu(menu)
         # Affichage des cours (avec enseignants et élèves)
         if (choix == 1):
-            print("Liste des cours \n")
+            print("*******************Liste des cours \n")
             school.display_courses_list()
 
         # Affichage des cours pour un étudiant donné (par son numéro)
         elif (choix == 2):
             # On affiche la liste des étudiants
-            print("Liste des étudiants\n")
+            print("*******************Liste des étudiants\n")
             list_students_show = school.get_students_list()
             for numero, student in enumerate(list_students_show, start=1):
                 print(f"{numero} - {student}")
@@ -295,12 +311,12 @@ Bienvenue dans notre école
 
         # Affichage de la liste des étudiants
         elif (choix == 3):
-            print("Liste des étudiants \n")
+            print("*******************Liste des étudiants \n")
             school.display_students_list()
 
         # Affichage de la liste des enseignants
         elif (choix == 4):
-            print("Liste des enseignants \n")
+            print("*******************Liste des enseignants \n")
             school.display_teachers_list()
 
         # Gestion des cours
